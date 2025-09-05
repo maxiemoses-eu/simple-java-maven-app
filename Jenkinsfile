@@ -2,19 +2,36 @@ pipeline {
     agent any
     maven 9
    
-        stage('Build') {
-            steps {
-                // Assuming `mvn clean install` is the build command
-                sh 'mvn clean install -DskipTests' 
-            }
-        }
+       pipeline {
+    agent any
 
-        stage('Test') {
+    stages {
+        stage('build') {
             steps {
-                // Running tests
-                sh 'mvn test'
+                scritp {
+                  echo 'building the application...'
+                  sh 'mvn clean package'
+                }
             }
         }
+        stage('test') {
+            steps {
+                script {
+                  echo 'testing the application...'
+                  sh 'mvn clean package'
+                }
+            }
+        }
+        stage('deploy') {
+            steps {
+                script {
+                  echo 'deploying the application...'
+                  }
+            }
+        }
+    }
+}
+
         
         stage('Archive Artifact') {
             steps {
