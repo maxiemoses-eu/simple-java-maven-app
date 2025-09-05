@@ -19,6 +19,20 @@ pipeline {
                 sh 'mvn clean install -DskipTests'
             }
         }
+        stage('Build Docker Image') {
+        steps {
+            script {
+                // Generates a unique tag for the Docker image using the build number.
+                def imageName = "simple-java-maven-app"
+                def imageTag = "${imageName}:${env.BUILD_NUMBER}"
+                
+                // Builds the Docker image using the Dockerfile in the current directory.
+                // The image is tagged with the generated tag.
+                echo "Building Docker image: ${imageTag}"
+                sh "docker build -t ${imageTag} ."
+            }
+        }
+    }
 
         stage('Test') {
             steps {
