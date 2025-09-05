@@ -1,7 +1,7 @@
 pipeline {
     agent any
     tools {
-        maven 'Maven 3.9'
+        maven 'Maven 3.10'
     }
 
     stages {
@@ -12,32 +12,27 @@ pipeline {
             }
         }
 
-        stage('Build') {
+        stage('Build & Test') {
             steps {
-                // Runs the Maven build command. The -DskipTests flag is used
-                // to separate the build from the test stage for better pipeline visibility.
-                sh 'mvn clean install -DskipTests'
+                // The 'mvn clean install' command compiles the code, runs the tests,
+                // and packages the application into a JAR file. This single command
+                // combines the build and test stages for better efficiency.
+                sh 'mvn clean install'
             }
         }
-        stage('Build Docker Image') {
-        steps {
-            script {
-                // Generates a unique tag for the Docker image using the build number.
-                def imageName = "simple-java-maven-app"
-                def imageTag = "${imageName}:${env.BUILD_NUMBER}"
-                
-                // Builds the Docker image using the Dockerfile in the current directory.
-                // The image is tagged with the generated tag.
-                echo "Building Docker image: ${imageTag}"
-                sh "docker build -t ${imageTag} ."
-            }
-        }
-    }
 
-        stage('Test') {
+        stage('Build Docker Image') {
             steps {
-                // Executes the unit tests for the project.
-                sh 'mvn test'
+                script {
+                    // Generates a unique tag for the Docker image using the build number.
+                    def imageName = "simple-java-maven-app"
+                    def imageTag = "${imageName}:${env.BUILD_NUMBER}"
+                    
+                    // Builds the Docker image using the Dockerfile in the current directory.
+                    // The image is tagged with the generated tag.
+                    echo "Building Docker image: ${imageTag}"
+                    sh "docker build -t ${imageTag} ."
+                }
             }
         }
 
