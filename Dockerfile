@@ -1,26 +1,30 @@
-# The `maven-enforcer-plugin` in the project's pom.xml requires Maven version 3.9.9 or later.
-# This Dockerfile is updated to use a base image that meets that requirement.
-# Using a specific version (3.9.9) instead of `latest` ensures a consistent and reproducible build environment.
-FROM maven:3.9.9-jdk-17
+# This Dockerfile builds a simple Maven application and packages it into a Docker image.
 
-# The working directory for the application inside the Docker container.
+# Stage 1: Build the application using a Maven base image.
+# We're updating the Maven version here to 3.9.9 to satisfy the enforcer plugin
+# version requirement from the project's pom.xml.
+FROM maven:3.9.9-eclipse-temurin-21 AS build
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# Copy the project's pom.xml file to the container.
-# This is a best practice to leverage Docker's build cache.
+# Copy the pom.xml and source code into the container
 COPY pom.xml .
-
-# Copy the source code to the container.
 COPY src ./src
 
-# Build the application.
-# The `mvn clean install` command runs the build and tests.
-RUN mvn clean install
+# Build the application with Maven. This will compile, run tests, and package the JAR.
+RUN mvn clean package
 
-# The final image will expose the application, which runs on a specific port.
-# The port is defined by the application's configuration.
-EXPOSE 8080
+# Stage 2: Create a smaller, final image for the runtime environment.
+# Using a slim JRE image to reduce the final image size.
+FROM eclipse-temurin:21-jre-alpine
 
-# The command to run the application when the container starts.
-# It executes the generated .jar file.
-CMD ["java", "-jar", "target/simple-java-maven-app-1.0.jar"]
+# Set the working directory for the final image.
+WORKDIR /app
+
+# Copy the built JAR file from the build stage into the final image.
+COPY --from=build /app/target/my-app-1.0-SNAPSHOT.jar ./app.jar
+
+# Define the entrypoint for the application.
+# This command runs the JAR file when the container starts.
+ENTRYPOINT ["java", "-jar", "app.jar"]
