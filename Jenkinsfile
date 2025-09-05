@@ -1,35 +1,41 @@
 pipeline {
     agent any
-    tools {
-        maven 'Maven 3.9'
-    }
-    stsges {
-        stage ("build") {
+    maven 9
+   
+        stage('Build') {
             steps {
-                script {
-                    echo "building the application...
-                    sh 'mvn clean package'
-                }
+                // Assuming `mvn clean install` is the build command
+                sh 'mvn clean install -DskipTests' 
+            }
+        }
+
+        stage('Test') {
+            steps {
+                // Running tests
+                sh 'mvn test'
+            }
+        }
+        
+        stage('Archive Artifact') {
+            steps {
+                // Archives the resulting .jar file
+                archiveArtifacts artifacts: 'target/*.jar'
             }
         }
     }
-    stsges {
-        stage ("test") {
-            steps {
-                script {
-                    echo "tesing the application"
-                    sh 'mvn test'
-                }
-            }
+    
+    post {
+        always {
+            // Clean up workspace after the build is complete
+            deleteDir()
         }
-    }
-    stsges {
-        stage ("deploy") {
-            steps {
-                script {
-                    echo "tesing the application"
-                }
-            }
+        success {
+            echo 'Build successful!'
+            // You can add notifications here, like Slack or email
+        }
+        failure {
+            echo 'Build failed!'
+            // You can add notifications here for failures
         }
     }
 }
