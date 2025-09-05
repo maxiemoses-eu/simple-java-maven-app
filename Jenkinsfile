@@ -1,14 +1,10 @@
 pipeline {
     agent any
-    maven 9
-   
-       pipeline {
-    agent any
-
+    maven 'Maven 3.9'       
     stages {
         stage('build') {
             steps {
-                scritp {
+                script {
                   echo 'building the application...'
                   sh 'mvn clean package'
                 }
