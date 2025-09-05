@@ -1,34 +1,35 @@
-pipeline{
+pipeline {
     agent any
-    tools{
-      maven 'Maven 3.9'     
+    tools {
+        maven 'Maven 3.9'
     }
-
-    options {
-        skipStagesAfterUnstable()
-    }
-    stages {
-        stage('Build') {
+    stsges {
+        stage ("build") {
             steps {
-                sh 'mvn -B -DskipTests clean package'
-            }
-        }
-        stage('Test') {
-            steps {
-                sh 'mvn test'
-            }
-        post {
-            always {
-                junit 'target/surefire-reports/*.xml'
+                script {
+                    echo "building the application...
+                    sh 'mvn clean package'
                 }
             }
         }
-        stage('Deliver') { 
+    }
+    stsges {
+        stage ("test") {
             steps {
-                sh './jenkins/scripts/deliver.sh' 
+                script {
+                    echo "tesing the application"
+                    sh 'mvn clean package'
+                }
             }
         }
     }
-
-
+    stsges {
+        stage ("deploy") {
+            steps {
+                script {
+                    echo "tesing the application"
+                }
+            }
+        }
+    }
 }
