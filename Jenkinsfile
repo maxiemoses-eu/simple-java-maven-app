@@ -24,14 +24,41 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    // Generates a unique tag for the Docker image using the build number.
+                    // Define the Docker Hub username and repository name
+                    def dockerUser = "maxiemoses // ⬅️ Replace with your Docker Hub username
                     def imageName = "simple-java-maven-app"
-                    def imageTag = "${imageName}:${env.BUILD_NUMBER}"
+
+                    // Generates a unique tag for the Docker image using the build number and Docker Hub username.
+                    def imageTag = "${dockerUser}/${imageName}:${env.BUILD_NUMBER}"
                     
                     // Builds the Docker image using the Dockerfile in the current directory.
                     // The image is tagged with the generated tag.
                     echo "Building Docker image: ${imageTag}"
                     sh "docker build -t ${imageTag} ."
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                script {
+                    // Define the Docker Hub username and repository name
+                    def dockerUser = "maxiemoses" // ⬅️ Replace with your Docker Hub username
+                    def imageName = "simple-java-maven-app"
+
+                    // Generates the tag used for pushing the image
+                    def imageTag = "${dockerUser}/${imageName}:${env.BUILD_NUMBER}"
+
+                    // Login to Docker Hub using stored credentials.
+                    // 'docker-hub-credentials' is the ID of the 'Username with password' credential in Jenkins.
+                    echo "Logging in to Docker Hub..."
+                    withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                        sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
+                    }
+
+                    // Push the tagged Docker image to Docker Hub.
+                    echo "Pushing Docker image: ${imageTag}"
+                    sh "docker push ${imageTag}"
                 }
             }
         }
@@ -50,7 +77,7 @@ pipeline {
             deleteDir()
         }
         success {
-            echo 'Build and test successful! Artifact archived.'
+            echo 'Build, test, and push successful! Artifact archived.'
         }
         failure {
             echo 'Build failed. Check the logs for details.'
