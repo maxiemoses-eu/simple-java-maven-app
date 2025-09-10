@@ -25,7 +25,7 @@ pipeline {
             steps {
                 script {
                     // Define the Docker Hub username and repository name
-                    def dockerUser = "maxiemoses // ⬅️ Replace with your Docker Hub username
+                    def dockerUser = "maxiemoses"
                     def imageName = "simple-java-maven-app"
 
                     // Generates a unique tag for the Docker image using the build number and Docker Hub username.
@@ -43,14 +43,14 @@ pipeline {
             steps {
                 script {
                     // Define the Docker Hub username and repository name
-                    def dockerUser = "maxiemoses" // ⬅️ Replace with your Docker Hub username
+                    def dockerUser = "maxiemoses"
                     def imageName = "simple-java-maven-app"
 
                     // Generates the tag used for pushing the image
                     def imageTag = "${dockerUser}/${imageName}:${env.BUILD_NUMBER}"
 
                     // Login to Docker Hub using stored credentials.
-                    // 'docker-hub-credentials' is the ID of the 'Username with password' credential in Jenkins.
+                    // 'dockerhub-credentiail' is the ID of the 'Username with password' credential in Jenkins.
                     echo "Logging in to Docker Hub..."
                     withCredentials([usernamePassword(credentialsId: 'dockerhub-credentiail', passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
                         sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
