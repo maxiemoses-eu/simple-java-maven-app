@@ -25,7 +25,8 @@ pipeline {
             steps {
                 script {
                     // Define the Docker Hub username and repository name
-                    def dockerUser = "maxiemoses // ⬅️ Replace with your Docker Hub username
+                    // ⬅️ Replace with your Docker Hub username
+                    def dockerUser = "maxiemoses" 
                     def imageName = "simple-java-maven-app"
 
                     // Generates a unique tag for the Docker image using the build number and Docker Hub username.
@@ -43,7 +44,8 @@ pipeline {
             steps {
                 script {
                     // Define the Docker Hub username and repository name
-                    def dockerUser = "maxiemoses" // ⬅️ Replace with your Docker Hub username
+                    // ⬅️ Replace with your Docker Hub username
+                    def dockerUser = "maxiemoses"
                     def imageName = "simple-java-maven-app"
 
                     // Generates the tag used for pushing the image
